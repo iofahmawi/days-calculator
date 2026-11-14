@@ -236,8 +236,14 @@ const qEl=document.getElementById('q');
 const listEl=document.getElementById('list'),pager=document.getElementById('pager'),pgLbl=document.getElementById('pgLbl'),pgPrev=document.getElementById('pgPrev'),pgNext=document.getElementById('pgNext');
 const isPWA=()=>window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
 const pageSize=()=>isPWA()?8:7;
-let page=0,pgKey='',pageCount=1;
+let page=0,pgKey='',pageCount=1,allShown=false;
+function syncPager(){
+  const show=pageCount>1&&!openEl&&!allShown;
+  pager.hidden=!show;document.body.classList.toggle('paged',show);
+  if(show)placePager();
+}
 function syncLock(){
+  syncPager();
   const de=document.documentElement;de.style.overflowY='';
   const over=de.scrollHeight-de.clientHeight;
   if(!pager.hidden&&!openEl&&!listEl.querySelector('.sw.drag')&&over<=8)de.style.overflowY='hidden';
@@ -250,7 +256,7 @@ function placePager(){
 }
 window.addEventListener('resize',()=>{placePager();syncLock()});
 window.addEventListener('load',()=>{placePager();syncLock()});
-function expandAll(){listEl.querySelectorAll('.sw.pg').forEach(x=>x.classList.remove('pg'));pager.hidden=true;listEl.style.minHeight='';document.body.classList.remove('paged');syncLock()}
+function expandAll(){allShown=true;listEl.querySelectorAll('.sw.pg').forEach(x=>x.classList.remove('pg'));pager.hidden=true;listEl.style.minHeight='';document.body.classList.remove('paged');syncLock()}
 qEl.addEventListener('input',()=>render());
 document.getElementById('searchBtn').onclick=()=>{
   const top=document.querySelector('.top'),open=!top.classList.contains('s');
@@ -291,7 +297,7 @@ function render(){
   openEl=null;
   renderCats();
   const list=document.getElementById('list');
-  list.innerHTML='';pager.hidden=true;document.body.classList.remove('paged');
+  list.innerHTML='';allShown=false;pager.hidden=true;document.body.classList.remove('paged');
   const nq=norm(qEl.value);
   const view=items.filter(it=>(!curCat||it.cat===curCat)&&(!nq||norm(it.name).includes(nq)));
   const pgk=nq+'|'+curCat;
