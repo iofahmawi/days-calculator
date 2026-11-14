@@ -1,14 +1,14 @@
 <div dir="rtl">
 
-## 🗓️ حاسبة الأيام
+## 📅 حاسبة الأيام
 
 [![version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/iofahmawi/days-calculator)
-[![PWA](https://img.shields.io/badge/PWA-Enabled-brightgreen)](#)
+[![PWA](https://img.shields.io/badge/PWA-Enabled-brightgreen)](https://iofahmawi.github.io/days-calculator/)
 
 أداة ويب لحساب الأيام والساعات المنقضية منذ تاريخ معيّن، مناسبة لمتابعة الاشتراكات والمنتجات والمهام الدورية. تم تصميمها لتكون بسيطة وسريعة، مع التركيز على الخصوصية التامة، حيث تُحفظ جميع البيانات على جهازك فقط دون رفع أي شيء إلى خوادم خارجية.
 
 ### 🔗 تجربة الأداة
-* [🚀 معاينة حية للأداة](#)
+* [🚀 معاينة حية للأداة](https://iofahmawi.github.io/days-calculator/)
 
 ### ✨ الميزات الرئيسية
 
