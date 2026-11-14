@@ -25,6 +25,7 @@ h1{cursor:pointer;-webkit-user-select:none;user-select:none}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
 .wrap{max-width:520px;margin:0 auto;padding:16px}
+@media (display-mode:standalone){.wrap{padding-top:19px}}
 h1{font-size:20px;margin:8px 0 16px}
 .form{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;flex-direction:row;align-items:center;gap:10px}
 .form input{flex:1;min-width:0;height:42px}
@@ -312,7 +313,7 @@ function exportItems(){
   const blob=new Blob([JSON.stringify({items,catOrder:getCats()},null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
-  a.download='day calc '+ymd(new Date()).split('-').reverse().join('-')+'.json';
+  a.download='days calc '+ymd(new Date()).split('-').reverse().join('-')+'.json';
   document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
