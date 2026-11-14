@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>حاسبة الأيام</title>
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-1440.png">
 <link rel="apple-touch-icon" href="icon-1440.png">
 <meta name="theme-color" content="#f4f6f8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#10161c" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="حاسبة الأيام">
 <style>
 :root{--bg:#f4f6f8;--card:#fff;--text:#1c2733;--muted:#6b7a89;--accent:#2563eb;--border:#e2e8ee;--danger:#c0392b;
@@ -620,7 +621,7 @@ document.getElementById('eSave').onclick=()=>{
 document.getElementById('eCancel').onclick=closeEdit;
 modal.addEventListener('click',e=>{if(e.target===modal)closeEdit()});
 render();
-if('serviceWorker' in navigator)window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{})});
+if('serviceWorker' in navigator)window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})});
 </script>
 </body>
 </html>
