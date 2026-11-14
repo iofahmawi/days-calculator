@@ -102,6 +102,13 @@ button.add{font:inherit;font-weight:600;background:var(--accent);color:#fff;bord
 .sw.drag{z-index:5;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:none}
 .sw{-webkit-touch-callout:none}
 .sw{position:relative;border-radius:14px;overflow:hidden}
+.sw.pg{display:none}
+.pager{display:flex;align-items:center;justify-content:center;gap:14px;margin:10.75px 0 0}
+.pager[hidden]{display:none}
+.pager button{width:44px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;color:var(--text);background:var(--card);border:1px solid var(--border);border-radius:10px;cursor:pointer}
+.pager button:disabled{opacity:.35;cursor:default}
+.pager span{min-width:44px;text-align:center;color:var(--muted);font-size:14px}
+body.paged .wrap{padding-bottom:8px}
 .sw .bg{position:absolute;inset:0;display:flex;align-items:center;padding:0 22px;color:#fff;font-weight:700}
 .sw .item{position:relative;touch-action:pan-y;-webkit-user-select:none;user-select:none}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
@@ -134,6 +141,7 @@ button.cancel{font:inherit;font-weight:600;height:46px;color:var(--text);backgro
   </div>
   <div id="cats" hidden></div>
   <div class="list" id="list"></div>
+  <div class="pager" id="pager" hidden><button id="pgPrev" type="button" aria-label="السابق"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button><span id="pgLbl" dir="ltr"></span><button id="pgNext" type="button" aria-label="التالي"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button></div>
 </div>
 <div class="modal" id="modal" hidden>
   <div class="box">
@@ -225,7 +233,17 @@ function countWord(n){return n<=2?n+' بند':n<=10?n+' بنود':n+' بنداً
 function fmt(s){return s.split('-').reverse().join('-')}
 const norm=t=>String(t).toLowerCase().replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').trim();
 const qEl=document.getElementById('q');
-const listEl=document.getElementById('list');
+const listEl=document.getElementById('list'),pager=document.getElementById('pager'),pgLbl=document.getElementById('pgLbl'),pgPrev=document.getElementById('pgPrev'),pgNext=document.getElementById('pgNext');
+const isPWA=()=>window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+const pageSize=()=>isPWA()?8:7;
+let page=0,pgKey='';
+function syncLock(){
+  const de=document.documentElement;de.style.overflowY='';
+  const over=de.scrollHeight-de.clientHeight;
+  if(!pager.hidden&&!openEl&&!listEl.querySelector('.sw.drag')&&over<=8)de.style.overflowY='hidden';
+}
+window.addEventListener('resize',syncLock);
+function expandAll(){listEl.querySelectorAll('.sw.pg').forEach(x=>x.classList.remove('pg'));pager.hidden=true;document.body.classList.remove('paged');syncLock()}
 qEl.addEventListener('input',()=>render());
 document.getElementById('searchBtn').onclick=()=>{
   const top=document.querySelector('.top'),open=!top.classList.contains('s');
@@ -237,7 +255,7 @@ qEl.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();qEl.bl
 document.addEventListener('click',e=>{
   const top=document.querySelector('.top');
   if(!top.classList.contains('s'))return;
-  if(e.target.closest('.sbox,#moreBtn,#hmenu,.sw,.modal,#cats'))return;
+  if(e.target.closest('.sbox,#moreBtn,#hmenu,.sw,.modal,#cats,.pager'))return;
   top.classList.remove('s');
   qEl.tabIndex=-1;qEl.value='';qEl.blur();render();
 });
@@ -261,19 +279,23 @@ function renderCats(){
   });
 }
 let openEl=null;
-function closeOpts(){if(openEl){openEl.classList.remove('open');openEl=null}}
+function closeOpts(){if(openEl){openEl.classList.remove('open');openEl=null}syncLock()}
 function render(){
   openEl=null;
   renderCats();
   const list=document.getElementById('list');
-  list.innerHTML='';
+  list.innerHTML='';pager.hidden=true;document.body.classList.remove('paged');
   const nq=norm(qEl.value);
   const view=items.filter(it=>(!curCat||it.cat===curCat)&&(!nq||norm(it.name).includes(nq)));
+  const pgk=nq+'|'+curCat;
+  if(pgk!==pgKey){pgKey=pgk;page=0}
+  const ps=pageSize(),pages=Math.max(1,Math.ceil(view.length/ps));
+  if(page>pages-1)page=pages-1;
   if(!items.length){list.innerHTML='<div class="empty">لا توجد بنود بعد</div>';return}
   if(!view.length){list.innerHTML='<div class="empty">لا توجد نتائج</div>';return}
   view.forEach((it,i)=>{
     const big=label(daysSince(it));
-    const wrap=document.createElement('div');wrap.className='sw';wrap._it=it;
+    const wrap=document.createElement('div');wrap.className='sw'+(Math.floor(i/ps)!==page?' pg':'');wrap._it=it;
     const bg=document.createElement('div');bg.className='bg';
     const el=document.createElement('div');el.className='item';
     wrap.append(bg,el);
@@ -297,11 +319,18 @@ function render(){
     opts.append(mk(SV('<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>'),mTxt,'شهر'));
     opts.append(mk(SV('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),dTxt,'ساعة'));
     el.appendChild(opts);
-    el.addEventListener('click',e=>{if(e.target.closest('.opts'))return;const was=el.classList.contains('open');closeOpts();if(!was){el.classList.add('open');openEl=el}});
+    el.addEventListener('click',e=>{if(e.target.closest('.opts'))return;const was=el.classList.contains('open');closeOpts();if(!was){el.classList.add('open');openEl=el}syncLock()});
     attachSwipe(el,bg,it);
     list.appendChild(wrap);
   });
+  pager.hidden=pages<=1;document.body.classList.toggle('paged',pages>1);
+  pgLbl.textContent=(page+1)+' / '+pages;
+  pgPrev.disabled=page<=0;
+  pgNext.disabled=page>=pages-1;
+  syncLock();
 }
+pgPrev.onclick=()=>{if(page>0){page--;render();window.scrollTo(0,0)}};
+pgNext.onclick=()=>{page++;render();window.scrollTo(0,0)};
 document.getElementById('addBtn').onclick=()=>{
   const n=document.getElementById('name').value.trim();
   if(!n)return;
@@ -426,6 +455,8 @@ function attachSwipe(el,bg,it){
       if(!active||horiz!==null||qEl.value.trim()||curCat)return;
       closeMenu();closeOpts();drag=true;dragActive=true;
       try{el.setPointerCapture(id)}catch(_){}
+      const r0=sw.getBoundingClientRect().top;expandAll();
+      const r1=sw.getBoundingClientRect().top;if(r1!==r0)window.scrollBy(0,r1-r0);
       baseTop=sw.offsetTop;baseScroll=window.scrollY;lastY=sy;
       sw.classList.add('drag');
       if(navigator.vibrate)navigator.vibrate(15);
@@ -466,6 +497,7 @@ function attachSwipe(el,bg,it){
       items=[...listEl.children].map(x=>x._it).filter(Boolean);
       save();
       swiped=true;setTimeout(()=>{swiped=false},300);
+      setTimeout(()=>{page=Math.floor(Math.max(0,items.indexOf(it))/pageSize());render();window.scrollTo(0,0)},180);
       return;
     }
     el.style.transition='transform .2s';el.style.transform='';
@@ -616,7 +648,7 @@ document.getElementById('eSave').onclick=()=>{
   if(ec2.mode==='set'&&eEnd.value&&eEnd.value>=d){editing.end=eEnd.value;editing.endTime=eEndTime.value||editing.time;if(eShowVal==='end')editing.show='end';else delete editing.show;const w=parseInt(eWarn.value,10);if(Number.isInteger(w)&&w>=0&&w<=365&&w!==4)editing.warn=w;else delete editing.warn}else{delete editing.end;delete editing.endTime;delete editing.warn;delete editing.show}
   const c=eCat.value.trim().slice(0,30);
   if(c)editing.cat=c;else delete editing.cat;
-  if(adding){const ed=editing;items.unshift(ed);qEl.value='';document.getElementById('name').value='';save();closeEdit();render();return}
+  if(adding){const ed=editing;items.unshift(ed);page=0;qEl.value='';document.getElementById('name').value='';save();closeEdit();render();return}
   save();closeEdit();render();
 };
 document.getElementById('eCancel').onclick=closeEdit;
