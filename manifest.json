@@ -1,0 +1,20 @@
+{
+  "name": "حاسبة الأيام",
+  "short_name": "حاسبة الأيام",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "ar",
+  "dir": "rtl",
+  "background_color": "#f4f6f8",
+  "theme_color": "#f4f6f8",
+  "icons": [
+    {
+      "src": "/icon-1440.png",
+      "sizes": "192x192 512x512 1440x1440",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
