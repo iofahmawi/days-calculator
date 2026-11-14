@@ -236,7 +236,7 @@ const qEl=document.getElementById('q');
 const listEl=document.getElementById('list'),pager=document.getElementById('pager'),pgLbl=document.getElementById('pgLbl'),pgPrev=document.getElementById('pgPrev'),pgNext=document.getElementById('pgNext');
 const isPWA=()=>window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
 const pageSize=()=>isPWA()?8:7;
-let page=0,pgKey='';
+let page=0,pgKey='',pageCount=1;
 function syncLock(){
   const de=document.documentElement;de.style.overflowY='';
   const over=de.scrollHeight-de.clientHeight;
@@ -298,6 +298,7 @@ function render(){
   if(pgk!==pgKey){pgKey=pgk;page=0}
   const ps=pageSize(),pages=Math.max(1,Math.ceil(view.length/ps));
   if(page>pages-1)page=pages-1;
+  pageCount=pages;
   if(!items.length){list.innerHTML='<div class="empty">لا توجد بنود بعد</div>';return}
   if(!view.length){list.innerHTML='<div class="empty">لا توجد نتائج</div>';return}
   view.forEach((it,i)=>{
@@ -332,8 +333,6 @@ function render(){
   });
   pager.hidden=pages<=1;document.body.classList.toggle('paged',pages>1);
   pgLbl.textContent=(page+1)+' / '+pages;
-  pgPrev.disabled=page<=0;
-  pgNext.disabled=page>=pages-1;
   listEl.style.minHeight='';
   if(pages>1){
     const vis=[...listEl.children].filter(x=>x._it&&!x.classList.contains('pg'));
@@ -347,7 +346,7 @@ function render(){
   syncLock();
 }
 pgPrev.onclick=()=>{if(page>0){page--;render();window.scrollTo(0,0)}};
-pgNext.onclick=()=>{page++;render();window.scrollTo(0,0)};
+pgNext.onclick=()=>{if(page<pageCount-1){page++;render();window.scrollTo(0,0)}};
 document.getElementById('addBtn').onclick=()=>{
   const n=document.getElementById('name').value.trim();
   if(!n)return;
