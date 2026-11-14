@@ -51,7 +51,7 @@ input:focus{outline:none;border-color:var(--accent)}
 .fake{font-size:15px;white-space:nowrap;line-height:1}
 .fake .ap{line-height:0;margin-inline-start:4px}
 button.add{font:inherit;font-weight:600;background:var(--accent);color:#fff;border:0;border-radius:10px;padding:0;height:46px;cursor:pointer}
-.top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:1px 0 14.33px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:1px 0 16px}
 .top h1{margin:0;display:flex;align-items:center;gap:8px}
 .top h1 svg{color:var(--accent);flex:none;position:relative;top:-2px}
 .tools{display:flex;gap:8px}
@@ -72,7 +72,7 @@ button.add{font:inherit;font-weight:600;background:var(--accent);color:#fff;bord
 .dmenu button svg{color:var(--accent);flex:none}
 .dmenu button[hidden]{display:none}
 .dmenu button.dng svg{color:var(--danger)}
-#cats{display:flex;gap:8px;overflow-x:auto;margin-top:14.33px;padding-bottom:14px;margin-bottom:-14px;scrollbar-width:none}
+#cats{display:flex;gap:8px;overflow-x:auto;margin-top:16px;padding-bottom:14px;margin-bottom:-14px;scrollbar-width:none}
 #cats::-webkit-scrollbar{display:none}
 #cats[hidden]{display:none}
 #cats .chip{padding-top:1px}
@@ -84,10 +84,10 @@ button.add{font:inherit;font-weight:600;background:var(--accent);color:#fff;bord
 .chip.on{--bd-on:color-mix(in srgb,var(--border) 96%,var(--text) 4%);border-color:var(--bd-on);box-shadow:inset 0 0 0 .5px var(--bd-on)}
 .chip{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .chip.drag{position:relative;z-index:5;box-shadow:0 4px 12px rgba(0,0,0,.28);transition:none}
-.list{margin-top:14.33px;display:flex;flex-direction:column;gap:10.75px}
+.list{margin-top:16px;display:flex;flex-direction:column;gap:10.75px}
 .item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12.43px 14px;display:flex;align-items:center;gap:12px}
 .item{flex-wrap:wrap;row-gap:0;cursor:pointer}
-.opts{display:none;flex-basis:100%;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.opts{display:none;flex-basis:100%;align-items:center;justify-content:space-between;gap:8px;margin-top:7.5px;padding-top:7.5px;border-top:1px solid var(--border)}
 .item.open .opts{display:flex}
 .stat{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;white-space:nowrap;-webkit-user-select:none;user-select:none}
 .stat svg{color:var(--accent);flex:none}
@@ -236,18 +236,18 @@ const qEl=document.getElementById('q');
 const listEl=document.getElementById('list'),pager=document.getElementById('pager'),pgLbl=document.getElementById('pgLbl'),pgPrev=document.getElementById('pgPrev'),pgNext=document.getElementById('pgNext');
 const isPWA=()=>window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
 const pageSize=()=>isPWA()?8:7;
-let page=0,pgKey='',pageCount=1,allShown=false;
+let page=0,pgKey='',pageCount=1,allShown=false,pgTimer=0;
 function syncPager(){
   const show=pageCount>1&&!openEl&&!allShown;
   pager.hidden=!show;document.body.classList.toggle('paged',pageCount>1&&!allShown);
   if(show)placePager();
 }
-function syncLock(){
-  syncPager();
+function lockCheck(){
   const de=document.documentElement;de.style.overflowY='';
   const over=de.scrollHeight-de.clientHeight;
   if(!pager.hidden&&!openEl&&!listEl.querySelector('.sw.drag')&&over<=8)de.style.overflowY='hidden';
 }
+function syncLock(){syncPager();lockCheck()}
 function placePager(){
   if(pager.hidden)return;
   pager.style.marginTop='10.75px';
@@ -297,7 +297,7 @@ function render(){
   openEl=null;
   renderCats();
   const list=document.getElementById('list');
-  list.innerHTML='';allShown=false;pager.hidden=true;document.body.classList.remove('paged');
+  list.innerHTML='';allShown=false;pager.hidden=true;document.body.classList.remove('paged','opened');
   const nq=norm(qEl.value);
   const view=items.filter(it=>(!curCat||it.cat===curCat)&&(!nq||norm(it.name).includes(nq)));
   const pgk=nq+'|'+curCat;
