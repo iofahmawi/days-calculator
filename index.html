@@ -87,8 +87,11 @@ button.add{font:inherit;font-weight:600;background:var(--accent);color:#fff;bord
 .list{margin-top:16px;display:flex;flex-direction:column;gap:10.75px}
 .item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12.43px 14px;display:flex;align-items:center;gap:12px}
 .item{flex-wrap:wrap;row-gap:0;cursor:pointer}
-.opts{display:none;flex-basis:100%;align-items:center;justify-content:space-between;gap:8px;margin-top:7.5px;padding-top:7.5px;border-top:1px solid var(--border)}
-.item.open .opts{display:flex}
+.opts{display:none;flex-basis:100%;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--border)}
+.r1{flex:1;min-width:0;display:flex;align-items:center;gap:12px}
+.item.open{display:grid;grid-template-columns:100%;grid-template-rows:minmax(48.4px,1fr) minmax(48.4px,1fr);padding-top:0;padding-bottom:0;row-gap:0}
+.item.open .r1{align-self:start;padding-top:12.43px}
+.item.open .opts{display:flex;grid-column:1/-1;align-self:stretch}
 .stat{display:flex;align-items:center;height:36px;gap:6px;font-size:14px;font-weight:600;white-space:nowrap;-webkit-user-select:none;user-select:none}
 .stat svg{color:var(--accent);flex:none}
 .stat .u{color:inherit}
@@ -312,7 +315,7 @@ function render(){
     const bg=document.createElement('div');bg.className='bg';
     const el=document.createElement('div');el.className='item';
     wrap.append(bg,el);
-    el.innerHTML='<div class="info"><div class="name"></div></div><div class="days"><b></b></div>';
+    el.innerHTML='<div class="r1"><div class="info"><div class="name"></div></div><div class="days"><b></b></div></div>';
     el.querySelector('.name').textContent=it.name;
     const daysEl=el.querySelector('.days'),b=daysEl.querySelector('b');
     if(it.end){const t=new Date(),[ey,em,ed]=it.end.split('-').map(Number);if(Math.round((Date.UTC(ey,em-1,ed)-Date.UTC(t.getFullYear(),t.getMonth(),t.getDate()))/864e5)<=(it.warn!=null?it.warn:4))b.style.color='var(--danger)'}
