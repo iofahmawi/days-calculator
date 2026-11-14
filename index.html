@@ -108,7 +108,7 @@ button.add{font:inherit;font-weight:600;background:var(--accent);color:#fff;bord
 .pager button{width:44px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;color:var(--text);background:var(--card);border:1px solid var(--border);border-radius:10px;cursor:pointer}
 .pager button:disabled{opacity:.35;cursor:default}
 .pager span{min-width:44px;text-align:center;color:var(--muted);font-size:14px}
-body.paged .wrap{padding-bottom:8px}
+body.paged .wrap{padding-bottom:0}
 .sw .bg{position:absolute;inset:0;display:flex;align-items:center;padding:0 22px;color:#fff;font-weight:700}
 .sw .item{position:relative;touch-action:pan-y;-webkit-user-select:none;user-select:none}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
@@ -242,7 +242,14 @@ function syncLock(){
   const over=de.scrollHeight-de.clientHeight;
   if(!pager.hidden&&!openEl&&!listEl.querySelector('.sw.drag')&&over<=8)de.style.overflowY='hidden';
 }
-window.addEventListener('resize',syncLock);
+function placePager(){
+  if(pager.hidden)return;
+  pager.style.marginTop='10.75px';
+  const R=document.documentElement.clientHeight-(listEl.getBoundingClientRect().bottom+window.scrollY);
+  pager.style.marginTop=Math.max(10.75,(R-34)/2)+'px';
+}
+window.addEventListener('resize',()=>{placePager();syncLock()});
+window.addEventListener('load',()=>{placePager();syncLock()});
 function expandAll(){listEl.querySelectorAll('.sw.pg').forEach(x=>x.classList.remove('pg'));pager.hidden=true;listEl.style.minHeight='';document.body.classList.remove('paged');syncLock()}
 qEl.addEventListener('input',()=>render());
 document.getElementById('searchBtn').onclick=()=>{
@@ -336,6 +343,7 @@ function render(){
       listEl.style.minHeight=(ps*h+(ps-1)*gap)+'px';
     }
   }
+  placePager();
   syncLock();
 }
 pgPrev.onclick=()=>{if(page>0){page--;render();window.scrollTo(0,0)}};
